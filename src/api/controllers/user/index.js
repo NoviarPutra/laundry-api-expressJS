@@ -76,8 +76,7 @@ module.exports = {
           });
         }
       } catch (error) {
-        console.log(error);
-        return res.send({
+        return res.status(400).json({
           message: error,
         });
       }
