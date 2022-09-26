@@ -1,6 +1,7 @@
 const express = require("express");
 const { default: mongoose } = require("mongoose");
 const router = require("./src/router");
+// const routerUser = require("./src/router");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -10,6 +11,9 @@ const URI = process.env.URI;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// app.use("/api/v1", routerUser);
+// app.use("/api/v1", routerUser);
 
 router(app);
 

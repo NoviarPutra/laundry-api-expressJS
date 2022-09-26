@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-const { User } = require("../../models");
+const { saveUser, isAutheticated } = require("../../models/user");
 dotenv.config();
 
 module.exports = {
@@ -14,13 +14,13 @@ module.exports = {
         const hashPassword = crypto
           .pbkdf2Sync(password, salt, 1000, 64, "sha512")
           .toString("hex");
-        const payload = new User({
+        const payload = {
           username: username,
           email: email,
           salt: salt,
           password: hashPassword,
-        });
-        const results = await payload.save();
+        };
+        const results = await saveUser(payload);
         return res.status(201).json({
           status: 201,
           messages: `${results.username} added successfully`,
@@ -49,17 +49,22 @@ module.exports = {
     };
     const SECRET = process.env.SECRET;
     const option = {
-      algorithm: "HS256",
+      expiresIn: "1h",
     };
     if (method === "POST") {
       try {
-        const findUser = await User.find(payload);
-        if (findUser.length > 0) {
+        const result = await isAutheticated(payload);
+        if (result) {
           const compare = crypto
-            .pbkdf2Sync(password, findUser[0].salt, 1000, 64, "sha512")
+            .pbkdf2Sync(password, result.salt, 1000, 64, "sha512")
             .toString("hex");
-          if (compare === findUser[0].password) {
-            const token = jwt.sign(username, SECRET, option);
+          if (compare === result.password) {
+            const data = {
+              id: result._id,
+              username: username,
+              email: result.email,
+            };
+            const token = jwt.sign(data, SECRET, option);
             return res.status(200).json({
               isLogin: true,
               token: token,
@@ -72,6 +77,7 @@ module.exports = {
           }
         } else {
           return res.status(404).json({
+            isLogin: false,
             message: "Username not found",
           });
         }
@@ -80,6 +86,11 @@ module.exports = {
           message: error,
         });
       }
+    } else {
+      return res.status(405).json({
+        status: 405,
+        message: "Method Not Allowed",
+      });
     }
   },
 };

@@ -1,9 +1,9 @@
-const { User } = require("../schema");
+const { Product } = require("../schema");
 
 module.exports = {
-  saveUser: (payload) => {
+  saveProduct: (payload) => {
     const response = new Promise((resolve, reject) => {
-      new User(payload).save((err, result) => {
+      new Product(payload).save((err, result) => {
         if (!err) {
           resolve(result);
         } else {
@@ -13,18 +13,16 @@ module.exports = {
     });
     return response;
   },
-  isAutheticated: ({ username }) => {
+  getAll: (query) => {
+    let { limit, ...search } = query;
     const response = new Promise((resolve, reject) => {
-      const payload = {
-        username: username,
-      };
-      User.findOne(payload, (err, result) => {
+      Product.find(search, (err, result) => {
         if (!err) {
           resolve(result);
         } else {
           reject(err);
         }
-      });
+      }).limit(limit ? limit : 10);
     });
     return response;
   },
