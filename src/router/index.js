@@ -1,12 +1,8 @@
-const express = require("express");
-// const router = express.Router();
-const { signUp, signIn } = require("../api/controllers/user");
+const { auth } = require("../api/middlewares");
+const userRouter = require("./user");
+const productRouter = require("./product");
 
-// router.post("/user/register", signUp);
-// router.post("/user/login", signIn);
-
-// module.exports = router;
 module.exports = (app) => {
-  app.use("/api/v1/user/register", signUp);
-  app.use("/api/v1/user/login", signIn);
+  app.use("/api/v1/user", userRouter);
+  app.use("/api/v1/product", [auth], productRouter);
 };

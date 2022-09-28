@@ -6,43 +6,34 @@ dotenv.config();
 
 module.exports = {
   signUp: async (req, res) => {
-    const method = req.method;
-    if (method === "POST") {
-      try {
-        const { username, email, password } = req.body;
-        const salt = crypto.randomBytes(16).toString("hex");
-        const hashPassword = crypto
-          .pbkdf2Sync(password, salt, 1000, 64, "sha512")
-          .toString("hex");
-        const payload = {
-          username: username,
-          email: email,
-          salt: salt,
-          password: hashPassword,
-        };
-        const results = await saveUser(payload);
-        return res.status(201).json({
-          status: 201,
-          messages: `${results.username} added successfully`,
-          data: results,
-        });
-      } catch (error) {
-        return res.json({
-          success: false,
-          messages: `${
-            error.keyValue.username || error.keyValue.email
-          } is registered`,
-        });
-      }
-    } else {
-      return res.status(405).json({
-        status: 405,
-        message: "Method Not Allowed",
+    try {
+      const { username, email, password } = req.body;
+      const salt = crypto.randomBytes(16).toString("hex");
+      const hashPassword = crypto
+        .pbkdf2Sync(password, salt, 1000, 64, "sha512")
+        .toString("hex");
+      const payload = {
+        username: username,
+        email: email,
+        salt: salt,
+        password: hashPassword,
+      };
+      const results = await saveUser(payload);
+      return res.status(201).json({
+        status: 201,
+        messages: `${results.username} added successfully`,
+        data: results,
+      });
+    } catch (error) {
+      return res.json({
+        success: false,
+        messages: `${
+          error.keyValue.username || error.keyValue.email
+        } is registered`,
       });
     }
   },
   signIn: async (req, res) => {
-    const method = req.method;
     const { username, password } = req.body;
     const payload = {
       username: username,
@@ -51,45 +42,39 @@ module.exports = {
     const option = {
       expiresIn: "1h",
     };
-    if (method === "POST") {
-      try {
-        const result = await isAutheticated(payload);
-        if (result) {
-          const compare = crypto
-            .pbkdf2Sync(password, result.salt, 1000, 64, "sha512")
-            .toString("hex");
-          if (compare === result.password) {
-            const data = {
-              id: result._id,
-              username: username,
-              email: result.email,
-            };
-            const token = jwt.sign(data, SECRET, option);
-            return res.status(200).json({
-              isLogin: true,
-              token: token,
-            });
-          } else {
-            return res.status(400).json({
-              isLogin: false,
-              message: "wrong password",
-            });
-          }
+    try {
+      const result = await isAutheticated(payload);
+      if (result) {
+        const compare = crypto
+          .pbkdf2Sync(password, result.salt, 1000, 64, "sha512")
+          .toString("hex");
+        if (compare === result.password) {
+          const data = {
+            id: result._id,
+            username: username,
+            email: result.email,
+          };
+          const token = jwt.sign(data, SECRET, option);
+          return res.status(200).json({
+            isLogin: true,
+            user: username,
+            token: token,
+          });
         } else {
-          return res.status(404).json({
+          return res.status(400).json({
             isLogin: false,
-            message: "Username not found",
+            message: "wrong password",
           });
         }
-      } catch (error) {
-        return res.status(400).json({
-          message: error,
+      } else {
+        return res.status(404).json({
+          isLogin: false,
+          message: "Username not found",
         });
       }
-    } else {
-      return res.status(405).json({
-        status: 405,
-        message: "Method Not Allowed",
+    } catch (error) {
+      return res.status(400).json({
+        message: error,
       });
     }
   },
