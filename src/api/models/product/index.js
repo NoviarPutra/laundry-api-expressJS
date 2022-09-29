@@ -26,4 +26,40 @@ module.exports = {
     });
     return response;
   },
+  getById: (id) => {
+    const response = new Promise((resolve, reject) => {
+      Product.findById(id, (err, result) => {
+        if (!err) {
+          resolve(result);
+        } else {
+          reject(err);
+        }
+      });
+    });
+    return response;
+  },
+  edit: (id, data) => {
+    const response = new Promise((resolve, reject) => {
+      Product.findByIdAndUpdate(id, data, (err, result) => {
+        if (!err) {
+          resolve(result);
+        } else {
+          reject(err);
+        }
+      });
+    });
+    return response;
+  },
+  remove: (id) => {
+    const response = new Promise((resolve, reject) => {
+      Product.findByIdAndRemove(id, (err, result) => {
+        if (!err) {
+          resolve(result);
+        } else {
+          reject(err);
+        }
+      });
+    });
+    return response;
+  },
 };
