@@ -20,13 +20,15 @@ module.exports = {
       };
       const results = await saveUser(payload);
       return res.status(201).json({
-        status: 201,
+        code: 201,
+        status: "Created",
         messages: `${results.username} added successfully`,
         data: results,
       });
     } catch (error) {
-      return res.json({
-        success: false,
+      return res.status(400).json({
+        code: 400,
+        status: "Bad Request",
         messages: `${
           error.keyValue.username || error.keyValue.email
         } is registered`,
@@ -56,19 +58,21 @@ module.exports = {
           };
           const token = jwt.sign(data, SECRET, option);
           return res.status(200).json({
-            isLogin: true,
-            user: username,
+            code: 200,
+            status: "Ok",
             token: token,
           });
         } else {
           return res.status(400).json({
-            isLogin: false,
-            message: "wrong password",
+            code: 400,
+            status: "Bad Request",
+            message: "Wrong Password",
           });
         }
       } else {
         return res.status(404).json({
-          isLogin: false,
+          code: 404,
+          status: "Not Found",
           message: "Username not found",
         });
       }

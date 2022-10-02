@@ -13,7 +13,8 @@ module.exports = {
     try {
       const response = await getAll(query);
       return res.status(200).json({
-        success: true,
+        code: 200,
+        status: "Ok",
         data: response,
       });
     } catch (error) {
@@ -31,11 +32,14 @@ module.exports = {
       };
       const response = await saveProduct(payload);
       return res.status(201).json({
-        succes: true,
+        code: 201,
+        status: "Created",
         data: response,
       });
     } catch (error) {
       return res.status(400).json({
+        code: 400,
+        status: "Bad Request",
         message: error,
       });
     }
@@ -44,12 +48,23 @@ module.exports = {
     const id = handleId(req, res);
     try {
       const response = await getById(id);
-      return res.status(200).json({
-        succes: true,
-        data: response,
-      });
+      console.log(response);
+      if (response) {
+        return res.status(200).json({
+          code: 200,
+          status: "Ok",
+          data: response,
+        });
+      } else {
+        return res.status(404).json({
+          code: 404,
+          status: "Not Found",
+        });
+      }
     } catch (error) {
       return res.status(400).json({
+        code: 400,
+        status: "Bad Request",
         message: error,
       });
     }
@@ -59,11 +74,13 @@ module.exports = {
     try {
       const response = await edit(id, req.body);
       return res.status(200).json({
-        succes: true,
-        data: response,
+        code: 200,
+        status: "Ok",
       });
     } catch (error) {
       return res.status(400).json({
+        code: 400,
+        status: "Bad Request",
         message: error,
       });
     }
@@ -73,11 +90,14 @@ module.exports = {
     try {
       const response = await remove(id);
       return res.status(200).json({
-        succes: true,
+        code: 200,
+        status: "Ok",
         data: response,
       });
     } catch (error) {
       return res.status(400).json({
+        code: 400,
+        status: "Bad Request",
         message: error,
       });
     }
