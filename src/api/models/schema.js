@@ -37,12 +37,13 @@ const productSchema = Schema({
 });
 
 const fakturSchema = Schema({
-  tanggalTerima: String,
+  tanggalTerima: Date,
   nomorHP: {
     type: String,
     length: 12,
+    required: true,
   },
-  customerName: {
+  namaCustomer: {
     type: String,
     required: true,
   },
@@ -66,22 +67,17 @@ const fakturSchema = Schema({
   kembali: {
     type: Number,
   },
-  orderList: [
-    {
-      item: String,
-      jumlah: Number,
-    },
-  ],
-  orderStatus: {
+  statusCucian: {
     type: String,
-    enum: ["ONPROGRESS", "DONE"],
-    default: "ONPROGRESS",
+    enum: ["belum", "sudah"],
+    default: "belum",
   },
-  pickUpStatus: {
+  statusPengambilan: {
     type: String,
-    enum: ["YES", "NO"],
-    default: "NO",
+    enum: ["belum", "sudah"],
+    default: "belum",
   },
+  daftarBarang: [{ nama: String, jumlah: Number }],
   pic: {
     username: String,
     email: String,
